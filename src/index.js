@@ -17,7 +17,6 @@ const users = [];
  	username: 'danilo', 
  	todos: []
 }
-
 { 
   id: 'uuid', // precisa ser um uuid
   title: 'Nome da tarefa',
@@ -35,7 +34,7 @@ function checksExistsUserAccount(request, response, next) {
 
   if(!user){
     return response.status(404).json({
-      error: 'Mensagem do n exist erro'
+      error: 'Mensagem do erro'
     });
   }
 
@@ -52,7 +51,7 @@ app.post('/users', (request, response) => {
 
   if(existUsername){
     return response.status(400).json({
-      error: 'Mensagem do dzds erro'
+      error: 'Mensagem do erro'
     });
   }
 
@@ -71,7 +70,9 @@ app.post('/users', (request, response) => {
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
 
-  
+  const user = request.user;
+
+  return response.status(200).json(user.todos);
 
 });
 
@@ -93,7 +94,24 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const user  = request.user;
+
+  const {title ,deadline } = request.body;
+
+  const idSolicitado = request.params.id;
+
+  const todo = user.todos.find(x => x.id === idSolicitado);
+
+  if(!todo){
+    return response.status(404).json({
+      error: 'Mensagem do erro'
+    });
+  }
+
+  todo.title = title;
+  todo.deadline = deadline;
+
+  return response.status(200).json(todo);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
