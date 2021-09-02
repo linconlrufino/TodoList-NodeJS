@@ -10,24 +10,36 @@ app.use(express.json());
 
 const users = [];
 
-// { 
-// 	id: 'uuid', // precisa ser um uuid
-// 	name: 'Danilo Vieira', 
-// 	username: 'danilo', 
-// 	todos: []
-// }
+/* 
+{ 
+ 	id: 'uuid', // precisa ser um uuid
+ 	name: 'Danilo Vieira', 
+ 	username: 'danilo', 
+ 	todos: []
+}
+
+{ 
+  id: 'uuid', // precisa ser um uuid
+  title: 'Nome da tarefa',
+  done: false, 
+  deadline: '2021-02-27T00:00:00.000Z', 
+  created_at: '2021-02-22T00:00:00.000Z'
+  }
+*/
 
 function checksExistsUserAccount(request, response, next) {
   
-  const { username } = request.header;
+  const { username } = request.headers;
 
-  const existUser = users.find(x => x.username === username);
+  const user = users.find(x => x.username === username);
 
-  if(!existUser){
+  if(!user){
     return response.status(404).json({
-      error: 'Mensagem do erro'
+      error: 'Mensagem do n exist erro'
     });
   }
+
+  request.user = user;
 
   return next();
 }
@@ -40,7 +52,7 @@ app.post('/users', (request, response) => {
 
   if(existUsername){
     return response.status(400).json({
-      error: 'Mensagem do erro'
+      error: 'Mensagem do dzds erro'
     });
   }
 
@@ -58,11 +70,26 @@ app.post('/users', (request, response) => {
 });
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+
+  
+
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { title , deadline } = request.body;
+  const user = request.user;
+
+  const todo = {
+    id : uuidv4(),
+    title,
+    done: false,
+    deadline: new Date(deadline),
+    created_at: new Date()
+  };
+
+  user.todos.push(todo);
+
+  return response.status(201).json(todo);
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
